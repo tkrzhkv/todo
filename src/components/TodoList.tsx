@@ -13,7 +13,7 @@ import { FaTrash } from "react-icons/fa";
 
 interface Todo {
   id: string;
-  body: string;
+  text: string;
 }
 
 type TodoListProps = {
@@ -52,7 +52,7 @@ const TodoList = ({ todos, deleteTodo }: TodoListProps) => {
             size='md'
             colorScheme='green'
           ></Checkbox>
-          <Text>{todo.body}</Text>
+          <Text>{todo.text}</Text>
           <Spacer />
           <IconButton
             aria-label='delete-todo'

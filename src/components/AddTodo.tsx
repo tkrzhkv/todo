@@ -1,10 +1,9 @@
 import React, { FC, FormEvent } from "react";
 import { HStack, Input, Button, useToast } from "@chakra-ui/react";
-import { nanoid } from "nanoid";
 
 export interface TodoItem {
   id: string;
-  body: string;
+  text: string;
 }
 
 interface AddTodoProps {
@@ -26,13 +25,14 @@ const AddTodo: FC<AddTodoProps> = ({ onAddTodo }) => {
       });
       return;
     }
+    const date = String(Date.now());
 
-    const totoItem = {
-      id: nanoid(),
-      body: content,
+    const todoItem = {
+      id: date,
+      text: content,
     };
 
-    onAddTodo(totoItem);
+    onAddTodo(todoItem);
     setContent("");
   }
 

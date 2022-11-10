@@ -4,18 +4,20 @@ import AddTodo, { TodoItem } from "./components/AddTodo";
 import TodoList from "./components/TodoList";
 import { FaSun, FaMoon } from "react-icons/fa";
 
-const App: React.FC = () => {
-  const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem("todos") || "[]"));
+const initTodos = JSON.parse(localStorage.getItem("todos") || "");
+
+const App = () => {
+  const [todos, setTodos] = useState<TodoItem[]>(initTodos);
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
-  const addTodo = (todo: TodoItem): void => {
+  const handleAddTodo = (todo: TodoItem): void => {
     setTodos([...todos, todo]);
   };
 
-  const deleteTodo = (id: string) => {
+  const onDeleteTodo = (id: string) => {
     const newTodos = todos.filter((todo: TodoItem) => {
       return todo.id !== id;
     });
@@ -35,9 +37,9 @@ const App: React.FC = () => {
       <Heading fontWeight='extrabold'>Todo List</Heading>
       <TodoList
         todos={todos}
-        deleteTodo={deleteTodo}
+        deleteTodo={onDeleteTodo}
       />
-      <AddTodo onAddTodo={addTodo} />
+      <AddTodo onAddTodo={handleAddTodo} />
     </VStack>
   );
 };
