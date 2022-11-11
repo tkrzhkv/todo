@@ -1,4 +1,4 @@
-import React from "react";
+import { FC, useState } from "react";
 import {
   VStack,
   HStack,
@@ -10,19 +10,32 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import { FaTrash } from "react-icons/fa";
+import { atom, useRecoilValue, useSetRecoilState } from "recoil";
+import useLocalStorage from "../hooks/useLocalStorage";
+import { Todo, TodoListProps } from "../@types/types";
 
-interface Todo {
-  id: string;
-  text: string;
-}
+const TodoList: FC = () => {
+  const [persistedTodos, setPersistedTodos] = useLocalStorage("todos", []);
 
-type TodoListProps = {
-  todos: Todo[];
-  deleteTodo: (id: string) => void;
-};
+  const todoListState = atom({
+    key: "todoListState",
+    default: persistedTodos,
+  });
 
-const TodoList = ({ todos, deleteTodo }: TodoListProps) => {
-  if (!todos.length) {
+  const todoList = useRecoilValue(todoListState);
+  const setTodoList = useSetRecoilState(todoListState);
+
+  const onDeleteTodo = (index: number) => {
+    setTodoList((oldTodoList: TodoListProps[]) => {
+      const newTodoList = oldTodoList.filter(function (el, i) {
+        return index !== i;
+      });
+      setPersistedTodos(newTodoList);
+      return newTodoList;
+    });
+  };
+
+  if (!todoList.length) {
     return (
       <Badge
         colorScheme='purple'
@@ -46,7 +59,7 @@ const TodoList = ({ todos, deleteTodo }: TodoListProps) => {
       maxW={{ base: "90vw", sm: "80vw", lg: "50vw", xl: "40vw" }}
       alignItems='strach'
     >
-      {todos.map((todo: Todo) => (
+      {todoList.map((todo: Todo, index: number) => (
         <HStack key={todo.id}>
           <Checkbox
             size='md'
@@ -57,7 +70,7 @@ const TodoList = ({ todos, deleteTodo }: TodoListProps) => {
           <IconButton
             aria-label='delete-todo'
             icon={<FaTrash />}
-            onClick={() => deleteTodo(todo.id)}
+            onClick={() => onDeleteTodo(index)}
           />
         </HStack>
       ))}

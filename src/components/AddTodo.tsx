@@ -1,21 +1,23 @@
-import React, { FC, FormEvent } from "react";
+import { FC, FormEvent } from "react";
 import { HStack, Input, Button, useToast } from "@chakra-ui/react";
+import { atom, useRecoilState, useSetRecoilState } from "recoil";
+import useLocalStorage from "../hooks/useLocalStorage";
+import { TodoItem } from "../@types/types";
 
-export interface TodoItem {
-  id: string;
-  text: string;
-}
-
-interface AddTodoProps {
-  onAddTodo: (totoItem: TodoItem) => void;
-}
-
-const AddTodo: FC<AddTodoProps> = ({ onAddTodo }) => {
+const AddTodo: FC = () => {
   const toast = useToast();
+  const [persistedTodos, setPersistedTodos] = useLocalStorage("todos", []);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const addTodoListState = atom({
+    key: "todoListState",
+    default: persistedTodos,
+  });
+
+  const setTodoList = useSetRecoilState(addTodoListState);
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!content) {
+    if (!text) {
       toast({
         title: "No content",
         description: "Enter your task please",
@@ -25,18 +27,26 @@ const AddTodo: FC<AddTodoProps> = ({ onAddTodo }) => {
       });
       return;
     }
-    const date = String(Date.now());
 
-    const todoItem = {
-      id: date,
-      text: content,
-    };
+    setTodoList((oldTodoList: TodoItem[]) => {
+      const newTodoList = [
+        ...oldTodoList,
+        {
+          text,
+          id: oldTodoList.length + 1,
+        },
+      ];
+      setPersistedTodos(newTodoList);
+      return newTodoList;
+    });
+    setText("");
+  };
+  const textState = atom({
+    key: "textState",
+    default: "",
+  });
 
-    onAddTodo(todoItem);
-    setContent("");
-  }
-
-  const [content, setContent] = React.useState("");
+  const [text, setText] = useRecoilState(textState);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -44,15 +54,15 @@ const AddTodo: FC<AddTodoProps> = ({ onAddTodo }) => {
         <Input
           variant='filled'
           placeholder='Enter your task'
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
         />
         <Button
           colorScheme='blue'
           px='8'
           type='submit'
         >
-          ADD
+          ADD TODO
         </Button>
       </HStack>
     </form>
