@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import {
   VStack,
   HStack,
@@ -61,10 +61,6 @@ const TodoList: FC = () => {
     >
       {todoList.map((todo: Todo, index: number) => (
         <HStack key={todo.id}>
-          <Checkbox
-            size='md'
-            colorScheme='green'
-          ></Checkbox>
           <Text>{todo.text}</Text>
           <Spacer />
           <IconButton
